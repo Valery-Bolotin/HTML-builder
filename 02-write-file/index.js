@@ -1,12 +1,20 @@
+let fs = require('fs');
 const path = require('path');
-const fs = require('fs');
-const process = require('process');
 
+const {stdin, stdout, exit } = process;
+let writableStream = fs.createWriteStream(path.join(__dirname, "file.txt"));
 
-const stream = fs.createWriteStream(path.join(__dirname, './text.txt'));
+stdout.write("Please, enter your message:\n");
+stdin.on("data", (data) => {
+  if (data.toString().trim() === "exit") {
+    stdout.write("OK. Welcome!");
+    exit();
+  } else {
+    writableStream.write(data);
+  }
+});
 
-process.stdout.write('Welcome, my friend!\nEnter your text\n');
-
-process.stdin.addListener('data', data => data.toString().trim() === 'exit' ? process.exit(process.stdout.write('ByE-BYE!')) : stream.write(data));
-
-process.addListener('SIGINT', () => process.exit(process.stdout.write('ByE-BYE!')));
+process.on("SIGINT", () => {
+  stdout.write("OK. Welcome!");
+  exit();
+});
